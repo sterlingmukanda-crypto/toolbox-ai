@@ -39,7 +39,13 @@ export default {
 			if (request.method === "POST") {
 				return handleChatRequest(request, env);
 			}
+        if (url.pathname === "/api/tts") {
+  if (request.method === "POST") {
+    return handleTTSRequest(request, env);
+  }
 
+  return new Response("Method not allowed", { status: 405 });
+		}
 			// Method not allowed for other request types
 			return new Response("Method not allowed", { status: 405 });
 		}
@@ -48,7 +54,59 @@ export default {
 		return new Response("Not found", { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
+// ================================
+// 🔊 TEXT TO SPEECH
+// ================================
 
+async function handleTTSRequest(
+  request: Request,
+  env: Env,
+): Promise<Response> {
+  try {
+    const { text = "" } = (await request.json()) as {
+      text?: string;
+    };
+
+    if (!text.trim()) {
+      return new Response(
+        JSON.stringify({ error: "Text is required" }),
+        {
+          status: 400,
+          headers: {
+            "content-type": "application/json",
+          },
+        },
+      );
+    }
+
+    const audio = await env.AI.run(
+      "@cf/myshell-ai/melotts",
+      {
+        prompt: text,
+        lang: "fr",
+      },
+      {
+        returnRawResponse: true,
+      },
+    );
+
+    return audio;
+  } catch (error) {
+    console.error("Error generating TTS:", error);
+
+    return new Response(
+      JSON.stringify({
+        error: "Failed to generate speech",
+      }),
+      {
+        status: 500,
+        headers: {
+          "content-type": "application/json",
+        },
+      },
+    );
+  }
+		}
 /**
  * Handles chat API requests
  */
