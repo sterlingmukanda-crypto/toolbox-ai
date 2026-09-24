@@ -141,9 +141,10 @@ async function handleChatRequest(
 		}
 
 		const inputs = {
-			messages,
-			max_tokens: 1024,
-			stream: true,
+  messages,
+  max_tokens: 1024,
+  temperature: 0.3,
+  stream: true,
 		} satisfies AiTextGenerationInput & { stream: true };
 
 		const stream = await env.AI.run<typeof MODEL_ID>(MODEL_ID, inputs, {
