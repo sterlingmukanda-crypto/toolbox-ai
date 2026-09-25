@@ -212,37 +212,41 @@ async function handleChatRequest(
 			messages.unshift({ role: "system", content: SYSTEM_PROMPT });
 		}
 
-		const inputs = {
-  messages,
-  max_tokens: 1024,
-  temperature: 0.3,
-  stream: true,
-		} satisfies AiTextGenerationInput & { stream: true };
+		const response = await env.AI.run<typeof MODEL_ID>(
+  MODEL_ID,
+  {
+    input: messages,
+    max_output_tokens: 1024,
+    tools: [
+      {
+        type: "web_search_preview",
+      },
+    ],
+  },
+  {
+    gateway: {
+      id: "default",
+    },
+  },
+);
 
-		const stream = await env.AI.run<typeof MODEL_ID>(MODEL_ID, inputs, {
-			// Uncomment to use AI Gateway
-			// gateway: {
-			//   id: "YOUR_GATEWAY_ID", // Replace with your AI Gateway ID
-			//   skipCache: false,      // Set to true to bypass cache
-			//   cacheTtl: 3600,        // Cache time-to-live in seconds
-			// },
-		});
+return new Response(JSON.stringify(response), {
+  headers: {
+    "content-type": "application/json",
+  },
+});
+		} catch (error) {
+  console.error("Error processing chat request:", error);
 
-		return new Response(stream, {
-			headers: {
-				"content-type": "text/event-stream; charset=utf-8",
-				"cache-control": "no-cache",
-				connection: "keep-alive",
-			},
-		});
-	} catch (error) {
-		console.error("Error processing chat request:", error);
-		return new Response(
-			JSON.stringify({ error: "Failed to process request" }),
-			{
-				status: 500,
-				headers: { "content-type": "application/json" },
-			},
-		);
-	}
+  return new Response(
+    JSON.stringify({
+      error: "Failed to process request",
+    }),
+    {
+      status: 500,
+      headers: {
+        "content-type": "application/json",
+      },
+    },
+  );
 }
