@@ -13,7 +13,7 @@ import { Env, ChatMessage } from "./types";
 // https
 
 // Default system prompt
-const MODEL_ID = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const MODEL_ID = "openai/gpt-4.1-mini";
 
 const SYSTEM_PROMPT = `
 Tu es l'assistant IA de ToolBox.
