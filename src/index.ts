@@ -136,7 +136,7 @@ export default {
   if (request.method === "POST") {
     return handleTTSRequest(request, env);
   }
-
+console.log("REPONSE IA COMPLETE :", JSON.stringify(response));
   return new Response("Method not allowed", { status: 405 });
 		}
 			// Method not allowed for other request types
