@@ -138,7 +138,7 @@ export default {
   }
 console.log("REPONSE IA COMPLETE :", JSON.stringify(response));
   return new Response("Method not allowed", { status: 405 });
-		}
+	}
 			// Method not allowed for other request types
 			return new Response("Method not allowed", { status: 405 });
 		}
